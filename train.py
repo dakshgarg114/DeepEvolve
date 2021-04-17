@@ -19,6 +19,8 @@ from keras                import backend as K
 
 import logging
 
+cp_callback = ModelCheckpoint(filepath="model.h5", verbose=1,save_best_only=True, monitor="accuracy")
+
 # Helper: Early stopping.
 early_stopper = EarlyStopping( monitor='val_loss', min_delta=0.1, patience=2, verbose=0, mode='auto' )
 
@@ -274,7 +276,7 @@ def train_and_score(genome, dataset):
         model = compile_model_cnn(genome, nb_classes, input_shape)
 
     history = LossHistory()
-
+    
     model.fit(x_train, y_train,
               batch_size=batch_size,
               epochs=epochs,  
@@ -282,7 +284,7 @@ def train_and_score(genome, dataset):
               verbose=1,
               validation_data=(x_test, y_test),
               #callbacks=[history])
-              callbacks=[early_stopper])
+              callbacks=[early_stopper,cp_callback])
 
     score = model.evaluate(x_test, y_test, verbose=0)
 
